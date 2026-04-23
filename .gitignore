@@ -1,0 +1,17 @@
+# Data files — downloaded locally, not committed (sources documented in README)
+data/raw/*
+data/processed/*
+
+# Keep folder structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+
+# IDE / system
+.claude/
+.venv/
+*.DS_Store
