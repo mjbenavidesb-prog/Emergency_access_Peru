@@ -78,17 +78,18 @@ def plot_top_served(metrics: pd.DataFrame, n: int = 15) -> plt.Figure:
 def plot_baseline_vs_alternative(metrics: pd.DataFrame) -> plt.Figure:
     """
     Scatter plot comparing baseline vs alternative scores.
-    Axes are clipped at the 95th percentile so the dense cluster of
-    low-scoring districts is visible; outliers are noted in the title.
+    Log scale handles the extreme outliers (Lima ~100) while keeping
+    the dense cluster of low-scoring rural districts visible.
     """
     df = metrics.dropna(subset=["baseline_score", "alternative_score"]).copy()
-    p95 = max(df["baseline_score"].quantile(0.95), df["alternative_score"].quantile(0.95))
-    n_out = ((df["baseline_score"] > p95) | (df["alternative_score"] > p95)).sum()
+    # Shift by small epsilon so log(0) is avoided
+    eps = 0.01
+    x = df["baseline_score"] + eps
+    y = df["alternative_score"] + eps
 
     fig, ax = plt.subplots(figsize=(8, 7))
     sc = ax.scatter(
-        df["baseline_score"].clip(upper=p95),
-        df["alternative_score"].clip(upper=p95),
+        x, y,
         c=df["avg_dist_km"].fillna(0),
         cmap="YlOrRd",
         alpha=0.6,
@@ -98,14 +99,17 @@ def plot_baseline_vs_alternative(metrics: pd.DataFrame) -> plt.Figure:
     cbar = fig.colorbar(sc, ax=ax, pad=0.02)
     cbar.set_label("Avg distance to nearest IPRESS (km)")
 
-    ax.plot([0, p95], [0, p95], "k--", linewidth=0.9, label="Equal scores")
-    ax.set_xlim(0, p95 * 1.05)
-    ax.set_ylim(0, p95 * 1.05)
-    ax.set_xlabel("Baseline Score")
-    ax.set_ylabel("Alternative Score (distance-penalized)")
+    lim_max = max(x.max(), y.max()) * 1.2
+    ax.plot([eps, lim_max], [eps, lim_max], "k--", linewidth=0.9, label="Equal scores (y = x)")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(eps * 0.8, lim_max)
+    ax.set_ylim(eps * 0.8, lim_max)
+    ax.set_xlabel("Baseline Score (log scale)")
+    ax.set_ylabel("Alternative Score — distance-penalized (log scale)")
     ax.set_title(
-        f"Baseline vs Alternative Access Score by District\n"
-        f"(axes clipped at 95th percentile — {n_out} outlier(s) not shown)",
+        "Baseline vs Alternative Access Score by District\n"
+        "(log scale — each dot is one district, colour = avg km to nearest IPRESS)",
         fontweight="bold",
     )
     ax.legend(fontsize=9)
@@ -214,7 +218,8 @@ def plot_map_score_diff(geo_metrics: gpd.GeoDataFrame) -> plt.Figure:
 def plot_map_n_ipress(geo_metrics: gpd.GeoDataFrame) -> plt.Figure:
     return _choropleth(
         geo_metrics, "n_ipress",
-        "Number of IPRESS Facilities per District",
+        "Number of IPRESS Facilities per District\n(Green = More Facilities = Better)",
+        cmap="YlGn",
         legend_label="Facilities",
     )
 
@@ -236,8 +241,9 @@ def save_summary_tables(metrics: pd.DataFrame, n: int = 15) -> None:
     tables = Path("output/tables")
     tables.mkdir(parents=True, exist_ok=True)
 
-    cols = ["distrito", "departamento", "provincia", "n_ipress", "n_camas",
-            "n_ccpp", "avg_dist_km", "baseline_score", "alternative_score", "score_diff"]
+    cols = ["ubigeo", "distrito", "departamento", "provincia", "n_ipress", "n_camas",
+            "n_ccpp", "avg_dist_km", "total_atenciones", "total_atendidos",
+            "baseline_score", "alternative_score", "score_diff"]
 
     pool = metrics[metrics["n_ccpp"] > 0]
 
