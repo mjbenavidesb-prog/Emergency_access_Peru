@@ -304,6 +304,7 @@ with tab4:
     geo_json["distrito"]    = geo_json["distrito"].fillna("Unknown")
     geo_json["departamen"]  = geo_json["departamen"].fillna("Unknown")
     geo_json[selected_var]  = geo_json[selected_var].fillna(0)
+    geo_json["geometry"]    = geo_json["geometry"].simplify(0.01, preserve_topology=True)
 
     m = folium.Map(location=[-9.19, -75.0], zoom_start=5, tiles="CartoDB positron")
 
