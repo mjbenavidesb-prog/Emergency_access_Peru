@@ -124,6 +124,14 @@ with tab2:
     metrics = load_metrics()
 
     st.header("Static Analysis")
+    st.markdown("""
+    The three chart pairs below were selected to answer the four analytical questions progressively:
+    first by identifying who is underserved, then by isolating the role of distance,
+    and finally by comparing demand against physical access constraints.
+    Bar charts were chosen for ranking comparisons (easy to read top/bottom lists),
+    a scatter plot for showing the relationship between two continuous scores across all districts,
+    and histograms for understanding distributional shape rather than just averages.
+    """)
 
     # --- row 1: underserved / served
     st.subheader("Which districts are most and least served?")
@@ -141,6 +149,10 @@ with tab2:
             "reflecting the strong urban concentration of health infrastructure."
         )
 
+    st.markdown("""
+    **Why these charts:** Bar charts make it immediately clear which districts sit at the extremes.
+    Showing both ends (most and least served) in one view allows direct comparison of the urban-rural gap.
+    """)
     st.divider()
 
     # --- row 2: baseline vs alternative + score diff
@@ -159,6 +171,11 @@ with tab2:
             "but a tail of districts lose significant score once distance is penalised."
         )
 
+    st.markdown("""
+    **Why these charts:** A scatter plot reveals whether the two scores agree or diverge across all 1,873 districts at once.
+    The score-difference histogram then shows how large that divergence is and how common it is —
+    something a table alone could not convey.
+    """)
     st.divider()
 
     # --- row 3: attendances + distance histogram
@@ -176,6 +193,12 @@ with tab2:
             "Most populated centers are within 5 km of an IPRESS, but the distribution has a long right tail — "
             "some communities are over 70 km from the nearest facility."
         )
+
+    st.markdown("""
+    **Why these charts:** A bar chart by department contextualizes where emergency demand is actually recorded,
+    highlighting reporting gaps in rural areas. The distance histogram justifies the distance-penalty approach:
+    the long tail confirms that for a significant minority of communities, proximity to care is a real barrier.
+    """)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TAB 3 — GEOSPATIAL RESULTS
