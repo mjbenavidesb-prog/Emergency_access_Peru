@@ -1,10 +1,18 @@
-# Data files — downloaded locally, not committed (sources documented in README)
+# Data files — large raw files not committed (sources documented in README)
 data/raw/*
 data/processed/*
 
 # Keep folder structure
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+
+# App runtime files — needed for reproducibility
+!data/raw/DISTRITOS.shp
+!data/raw/DISTRITOS.dbf
+!data/raw/DISTRITOS.prj
+!data/raw/DISTRITOS.shx
+!data/raw/DISTRITOS.cpg
+!data/processed/ipress_clean.csv
 
 # Python
 __pycache__/
